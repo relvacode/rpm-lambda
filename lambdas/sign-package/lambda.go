@@ -12,7 +12,7 @@ import (
 	"git.illumina.com/relvacode/rpm-lambda/storage"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/sassoftware/go-rpmutils"
+	"github.com/rustylynch/go-rpmutils"
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/sync/errgroup"
 	"io"
