@@ -18,11 +18,13 @@ TBD
 
 ## Compile
 
+To compile and build a distributable package, all you need is make, zip, and docker installed on your machine, then run:
+
 ```
-docker run -t --rm -w /src/ -v $PWD:/src/ --entrypoint bash golang:1.13-buster -c 'go build -o /src/sign-package ./lambdas/sign-package'
-docker run -t --rm -w /src/ -v $PWD:/src/ --entrypoint bash golang:1.13-buster -c 'go build -o /src/create-repo-metadata ./lambdas/create-repo-metadata'
-docker run -t --rm -w /src/ -v $PWD:/src/ --entrypoint bash golang:1.13-buster -c 'go build -o /src/sign-repo-metadata ./lambdas/sign-repo-metadata'
+make all
 ```
+
+You should obtain three zip files, one for each function.
 
 ## Install
 
@@ -149,7 +151,7 @@ aws secretsmanager create-secret --name gpg_passphrase --secret-binary file:///p
     ]
 }
 ```
-- Compile the `sign-package` binary (see above) and zip it.
+- Compile and zip the `sign-package` binary (see above).
 - Create the lambda with the `Go 1.x` runtime, upload the zip archive created above and set the following environment variables:
   - `LAMBDA_SECRET_GPG_KEY`: The name you used for the gpg private key aws secret, e.g. `gpg_key` in the example above
   - `LAMBDA_SECRET_GPG_PASSPHRASE`: The name you used for the gpg passphrase aws secret, e.g. `gpg_passphrase` in the example above
