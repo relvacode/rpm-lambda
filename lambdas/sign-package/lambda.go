@@ -6,6 +6,7 @@ package main // import "git.illumina.com/relvacode/rpm-lambda/lambdas/sign-packa
 
 import (
 	"context"
+	"fmt"
 	"git.illumina.com/relvacode/rpm-lambda/events"
 	"git.illumina.com/relvacode/rpm-lambda/secrets"
 	"git.illumina.com/relvacode/rpm-lambda/setup"
@@ -18,20 +19,23 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 const (
 	EnvS3TargetBucket             = `LAMBDA_S3_TARGET`
+	EnvS3TargetPath               = `LAMBDA_S3_TARGET_PATH`
 	EnvSigningKeySecret           = `LAMBDA_SECRET_GPG_KEY`
 	EnvSigningKeyPassphraseSecret = `LAMBDA_SECRET_GPG_PASSPHRASE`
 )
 
 type LambdaFunction struct {
-	l       aws.Logger
-	s3      *storage.S3
-	secrets secrets.GPGProvider
-	target  string
+	l           aws.Logger
+	s3          *storage.S3
+	secrets     secrets.GPGProvider
+	target      string
+	target_path string
 }
 
 func (f *LambdaFunction) HandleEvent(ctx context.Context, key *openpgp.Entity, event events.Event) error {
@@ -80,7 +84,12 @@ func (f *LambdaFunction) HandleEvent(ctx context.Context, key *openpgp.Entity, e
 		return err
 	})
 
-	err = f.s3.UploadObject(groupCtx, pr, f.target, event.Object.Key, "application/x-rpm")
+	s3Key := event.Object.Key
+	if f.target_path != "" {
+		s3Key = fmt.Sprintf("%s/%s", strings.TrimPrefix(filepath.Dir(f.target_path), "/"), filepath.Base(event.Object.Key))
+	}
+
+	err = f.s3.UploadObject(groupCtx, pr, f.target, s3Key, "application/x-rpm")
 	if err != nil {
 		return err
 	}
@@ -124,8 +133,9 @@ func main() {
 		}
 
 		f := LambdaFunction{
-			target: setup.GetEnv(EnvS3TargetBucket),
-			l:      setup.NewLog("lambda:sign-repo"),
+			target:      setup.GetEnv(EnvS3TargetBucket),
+			target_path: setup.GetEnv(EnvS3TargetPath, ""),
+			l:           setup.NewLog("lambda:sign-repo"),
 			s3: &storage.S3{
 				Session: s,
 			},
