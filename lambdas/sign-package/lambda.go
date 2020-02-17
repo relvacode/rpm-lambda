@@ -6,6 +6,7 @@ package main // import "git.illumina.com/relvacode/rpm-lambda/lambdas/sign-packa
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"git.illumina.com/relvacode/rpm-lambda/events"
 	"git.illumina.com/relvacode/rpm-lambda/secrets"
@@ -84,12 +85,17 @@ func (f *LambdaFunction) HandleEvent(ctx context.Context, key *openpgp.Entity, e
 		return err
 	})
 
+	s3Bucket := event.Bucket.Name
+	if f.target != "" {
+		s3Bucket = f.target
+	}
+
 	s3Key := event.Object.Key
 	if f.target_path != "" {
 		s3Key = fmt.Sprintf("%s/%s", strings.TrimPrefix(filepath.Dir(f.target_path), "/"), filepath.Base(event.Object.Key))
 	}
 
-	err = f.s3.UploadObject(groupCtx, pr, f.target, s3Key, "application/x-rpm")
+	err = f.s3.UploadObject(groupCtx, pr, s3Bucket, s3Key, "application/x-rpm")
 	if err != nil {
 		return err
 	}
@@ -132,9 +138,16 @@ func main() {
 			return err
 		}
 
+		target := setup.GetEnv(EnvS3TargetBucket, "")
+		target_path := setup.GetEnv(EnvS3TargetPath, "")
+
+		if target == "" && target_path == "" {
+			return errors.New(fmt.Sprintf("Either %s or %s must be set.", EnvS3TargetBucket, EnvS3TargetPath))
+		}
+
 		f := LambdaFunction{
-			target:      setup.GetEnv(EnvS3TargetBucket),
-			target_path: setup.GetEnv(EnvS3TargetPath, ""),
+			target:      target,
+			target_path: target_path,
 			l:           setup.NewLog("lambda:sign-repo"),
 			s3: &storage.S3{
 				Session: s,
