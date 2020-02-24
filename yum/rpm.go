@@ -2,7 +2,7 @@ package yum
 
 import (
 	"context"
-	"github.com/sassoftware/go-rpmutils"
+	"github.com/rustylynch/go-rpmutils"
 	"io"
 	"io/ioutil"
 )
