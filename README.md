@@ -19,9 +19,9 @@ TBD
 ## Compile
 
 ```
-docker run -t --rm -w /src/ -v $PWD:/src/ --entrypoint bash golang:1.13-buster -c 'go build -o /src/sign-package ./lambdas/sign-package'
-docker run -t --rm -w /src/ -v $PWD:/src/ --entrypoint bash golang:1.13-buster -c 'go build -o /src/create-repo-metadata ./lambdas/create-repo-metadata'
-docker run -t --rm -w /src/ -v $PWD:/src/ --entrypoint bash golang:1.13-buster -c 'go build -o /src/sign-repo-metadata ./lambdas/sign-repo-metadata'
+docker run --rm -w /usr/src/rpm-lambdas -v $PWD:/usr/src/rpm-lambdas golang:1 go build -o ./sign-package ./lambdas/sign-package
+docker run --rm -w /usr/src/rpm-lambdas -v $PWD:/usr/src/rpm-lambdas golang:1 go build -o ./create-repo-metadata ./lambdas/create-repo-metadata
+docker run --rm -w /usr/src/rpm-lambdas -v $PWD:/usr/src/rpm-lambdas golang:1 go build -o ./sign-repo-metadata ./lambdas/sign-repo-metadata
 ```
 
 ## Install
