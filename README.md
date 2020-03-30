@@ -156,7 +156,7 @@ aws secretsmanager create-secret --name gpg_passphrase --secret-binary file:///p
   - `LAMBDA_SECRET_GPG_KEY`: The name you used for the gpg private key aws secret, e.g. `gpg_key` in the example above
   - `LAMBDA_SECRET_GPG_PASSPHRASE`: The name you used for the gpg passphrase aws secret, e.g. `gpg_passphrase` in the example above
   - `LAMBDA_S3_TARGET`: (optional) The name of the bucket where the signed RPM will be uploaded. If unset, will use the same bucket
-     as the triggering event. Please not that either one of `LAMBDA_S3_TARGET` and `LAMBDA_S3_TARGET_PATH` (or both) need to be set.
+     as the triggering event. Please note that either one of `LAMBDA_S3_TARGET` and `LAMBDA_S3_TARGET_PATH` (or both) need to be set.
   - `LAMBDA_S3_TARGET_PATH`: (optional) The base path in your target bucket. If set, will replace the path of the RPM to sign. This
     allows to upload the resulting signed RPM in the same bucket as the unsigned one.
 
