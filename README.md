@@ -159,6 +159,10 @@ aws secretsmanager create-secret --name gpg_passphrase --secret-binary file:///p
      as the triggering event. Please note that either one of `LAMBDA_S3_TARGET` and `LAMBDA_S3_TARGET_PATH` (or both) need to be set.
   - `LAMBDA_S3_TARGET_PATH`: (optional) The base path in your target bucket. If set, will replace the path of the RPM to sign. This
     allows to upload the resulting signed RPM in the same bucket as the unsigned one.
+  - `LAMBDA_S3_BASE_PATH`: (optional) The base path in the source bucket. Requires `LAMBDA_S3_TARGET_PATH` to also be set. The value
+    of `LAMBDA_S3_BASE_PATH` will be substracted from the received event path to obtain a relative path that will be then added to
+    that of `LAMBDA_S3_TARGET_PATH`. This allows managing signing of RPMs for several sub-repositories with a single instance of the
+    sign-package lambda.
 
 ### create-repo-metadata
 
